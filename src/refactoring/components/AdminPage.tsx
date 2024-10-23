@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Coupon, Product } from '../../types.ts';
 import { useProductEditor } from '../hooks/useProductEditor.tsx';
 import { useCouponForm } from '../hooks/useCouponForm.tsx';
+import { useProductForm } from '../hooks/useProductForm.tsx';
 
 interface Props {
   products: Product[];
@@ -18,8 +19,6 @@ export const AdminPage = ({
   onProductAdd,
   onCouponAdd,
 }: Props) => {
-  const [showNewProductForm, setShowNewProductForm] = useState(false);
-
   const {
     editingProduct,
     openProductIds,
@@ -37,24 +36,13 @@ export const AdminPage = ({
 
   const { newCoupon, setNewCoupon, handleAddCoupon } = useCouponForm(onCouponAdd);
 
-  const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
-    name: '',
-    price: 0,
-    stock: 0,
-    discounts: [],
-  });
-
-  const handleAddNewProduct = () => {
-    const productWithId = { ...newProduct, id: Date.now().toString() };
-    onProductAdd(productWithId);
-    setNewProduct({
-      name: '',
-      price: 0,
-      stock: 0,
-      discounts: [],
-    });
-    setShowNewProductForm(false);
-  };
+  const {
+    showNewProductForm,
+    setShowNewProductForm,
+    newProduct,
+    setNewProduct,
+    handleAddNewProduct,
+  } = useProductForm(onProductAdd);
 
   return (
     <div className="container mx-auto p-4">
