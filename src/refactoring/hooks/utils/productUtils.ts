@@ -6,6 +6,5 @@ export const findProductById = (products: Product[], productId: string) =>
 export const removeDiscountByIndex = (discounts: Discount[], index: number) =>
   discounts.filter((_, i) => i !== index);
 
-export const updateProductInList = (products: Product[], updatedProduct: Product): Product[] => {
-  return products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p));
-};
+export const updateProductInList = (products: Product[], updatedProduct: Product): Product[] =>
+  products.map((p) => (p.id === updatedProduct.id ? updatedProduct : p));
