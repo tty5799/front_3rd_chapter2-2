@@ -364,4 +364,74 @@ describe('advanced > ', () => {
       });
     });
   });
+
+  const mockOnCouponAdd = vi.fn();
+
+  describe('useCouponForm >', () => {
+    beforeEach(() => {
+      mockOnCouponAdd.mockClear();
+    });
+
+    test('초기 상태가 올바른지 확인', () => {
+      const { result } = renderHook(() => useCouponForm(mockOnCouponAdd));
+
+      expect(result.current.newCoupon).toEqual({
+        name: '',
+        code: '',
+        discountType: 'percentage',
+        discountValue: 0,
+      });
+    });
+
+    test('쿠폰 정보를 업데이트할 수 있는지 확인', () => {
+      const { result } = renderHook(() => useCouponForm(mockOnCouponAdd));
+
+      act(() => {
+        result.current.setNewCoupon({
+          name: '할인 쿠폰',
+          code: 'DISCOUNT10',
+          discountType: 'amount',
+          discountValue: 1000,
+        });
+      });
+
+      expect(result.current.newCoupon).toEqual({
+        name: '할인 쿠폰',
+        code: 'DISCOUNT10',
+        discountType: 'amount',
+        discountValue: 1000,
+      });
+    });
+
+    test('쿠폰 추가 기능이 올바르게 동작하는지 확인', () => {
+      const { result } = renderHook(() => useCouponForm(mockOnCouponAdd));
+
+      act(() => {
+        result.current.setNewCoupon({
+          name: '프로모션 쿠폰',
+          code: 'PROMO20',
+          discountType: 'percentage',
+          discountValue: 20,
+        });
+      });
+
+      act(() => {
+        result.current.handleAddCoupon();
+      });
+
+      expect(mockOnCouponAdd).toHaveBeenCalledWith({
+        name: '프로모션 쿠폰',
+        code: 'PROMO20',
+        discountType: 'percentage',
+        discountValue: 20,
+      });
+
+      expect(result.current.newCoupon).toEqual({
+        name: '',
+        code: '',
+        discountType: 'percentage',
+        discountValue: 0,
+      });
+    });
+  });
 });
