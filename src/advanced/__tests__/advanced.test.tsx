@@ -234,12 +234,6 @@ describe('advanced > ', () => {
   describe('useProductEditor > ', () => {
     beforeEach(() => {
       mockOnProductUpdate.mockClear();
-
-      const { result } = renderHook(() => useProductEditor(mockProducts, mockOnProductUpdate));
-
-      act(() => {
-        result.current.handleEditProduct(mockProducts[0]);
-      });
     });
 
     test('초기 상태가 올바른지 확인', () => {
@@ -431,7 +425,6 @@ describe('advanced > ', () => {
 
   describe('useProductForm >', () => {
     beforeEach(() => {
-      // 매 테스트마다 mockOnProductAdd 호출 기록 초기화
       mockOnProductAdd.mockClear();
     });
 
