@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Coupon, Product } from '../../types.ts';
 import { useProductEditor } from '../hooks/useProductEditor.tsx';
+import { useCouponForm } from '../hooks/useCouponForm.tsx';
 
 interface Props {
   products: Product[];
@@ -17,6 +18,8 @@ export const AdminPage = ({
   onProductAdd,
   onCouponAdd,
 }: Props) => {
+  const [showNewProductForm, setShowNewProductForm] = useState(false);
+
   const {
     editingProduct,
     openProductIds,
@@ -32,29 +35,14 @@ export const AdminPage = ({
     handleRemoveDiscount,
   } = useProductEditor(products, onProductUpdate);
 
-  const [newCoupon, setNewCoupon] = useState<Coupon>({
-    name: '',
-    code: '',
-    discountType: 'percentage',
-    discountValue: 0,
-  });
-  const [showNewProductForm, setShowNewProductForm] = useState(false);
+  const { newCoupon, setNewCoupon, handleAddCoupon } = useCouponForm(onCouponAdd);
+
   const [newProduct, setNewProduct] = useState<Omit<Product, 'id'>>({
     name: '',
     price: 0,
     stock: 0,
     discounts: [],
   });
-
-  const handleAddCoupon = () => {
-    onCouponAdd(newCoupon);
-    setNewCoupon({
-      name: '',
-      code: '',
-      discountType: 'percentage',
-      discountValue: 0,
-    });
-  };
 
   const handleAddNewProduct = () => {
     const productWithId = { ...newProduct, id: Date.now().toString() };
