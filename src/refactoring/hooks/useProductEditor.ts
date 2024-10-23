@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Product, Discount } from '../../types';
+import { findProductById, removeDiscountByIndex } from './utils/productUtils.ts';
 
 export const useProductEditor = (
   products: Product[],
@@ -45,7 +46,8 @@ export const useProductEditor = (
   };
 
   const handleStockUpdate = (productId: string, newStock: number) => {
-    const updatedProduct = products.find((p) => p.id === productId);
+    const updatedProduct = findProductById(products, productId);
+
     if (updatedProduct) {
       const newProduct = { ...updatedProduct, stock: newStock };
       onProductUpdate(newProduct);
@@ -54,7 +56,8 @@ export const useProductEditor = (
   };
 
   const handleAddDiscount = (productId: string) => {
-    const updatedProduct = products.find((p) => p.id === productId);
+    const updatedProduct = findProductById(products, productId);
+
     if (updatedProduct && editingProduct) {
       const newProduct = {
         ...updatedProduct,
@@ -67,11 +70,12 @@ export const useProductEditor = (
   };
 
   const handleRemoveDiscount = (productId: string, index: number) => {
-    const updatedProduct = products.find((p) => p.id === productId);
+    const updatedProduct = findProductById(products, productId);
+
     if (updatedProduct) {
       const newProduct = {
         ...updatedProduct,
-        discounts: updatedProduct.discounts.filter((_, i) => i !== index),
+        discounts: removeDiscountByIndex(updatedProduct.discounts, index),
       };
       onProductUpdate(newProduct);
       setEditingProduct(newProduct);
