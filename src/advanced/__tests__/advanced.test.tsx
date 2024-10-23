@@ -1,18 +1,10 @@
 import { useState } from 'react';
 import { describe, expect, test, vi, beforeEach } from 'vitest';
-import {
-  act,
-  fireEvent,
-  render,
-  renderHook,
-  RenderHookResult,
-  screen,
-  within,
-} from '@testing-library/react';
+import { act, fireEvent, render, renderHook, screen, within } from '@testing-library/react';
 import { CartPage } from '../../refactoring/components/CartPage';
 import { AdminPage } from '../../refactoring/components/AdminPage';
 import { Coupon, Product } from '../../types';
-import { useCart, useCouponForm, useProductEditor } from '../../refactoring/hooks';
+import { useCouponForm, useProductEditor, useProductForm } from '../../refactoring/hooks';
 
 const mockProducts: Product[] = [
   {
@@ -432,6 +424,94 @@ describe('advanced > ', () => {
         discountType: 'percentage',
         discountValue: 0,
       });
+    });
+  });
+
+  const mockOnProductAdd = vi.fn();
+
+  describe('useProductForm >', () => {
+    beforeEach(() => {
+      // 매 테스트마다 mockOnProductAdd 호출 기록 초기화
+      mockOnProductAdd.mockClear();
+    });
+
+    test('초기 상태가 올바른지 확인', () => {
+      const { result } = renderHook(() => useProductForm(mockOnProductAdd));
+
+      expect(result.current.showNewProductForm).toBe(false);
+      expect(result.current.newProduct).toEqual({
+        name: '',
+        price: 0,
+        stock: 0,
+        discounts: [],
+      });
+    });
+
+    test('상품 정보를 업데이트할 수 있는지 확인', () => {
+      const { result } = renderHook(() => useProductForm(mockOnProductAdd));
+
+      act(() => {
+        result.current.setNewProduct({
+          name: '새 상품',
+          price: 5000,
+          stock: 50,
+          discounts: [{ quantity: 10, rate: 0.1 }],
+        });
+      });
+
+      expect(result.current.newProduct).toEqual({
+        name: '새 상품',
+        price: 5000,
+        stock: 50,
+        discounts: [{ quantity: 10, rate: 0.1 }],
+      });
+    });
+
+    test('상품 추가 기능이 올바르게 동작하는지 확인', () => {
+      const { result } = renderHook(() => useProductForm(mockOnProductAdd));
+
+      act(() => {
+        result.current.setNewProduct({
+          name: '새 상품',
+          price: 5000,
+          stock: 50,
+          discounts: [{ quantity: 10, rate: 0.1 }],
+        });
+      });
+
+      act(() => {
+        result.current.handleAddNewProduct();
+      });
+
+      expect(mockOnProductAdd).toHaveBeenCalledWith({
+        name: '새 상품',
+        price: 5000,
+        stock: 50,
+        discounts: [{ quantity: 10, rate: 0.1 }],
+        id: expect.any(String),
+      });
+
+      expect(result.current.newProduct).toEqual({
+        name: '',
+        price: 0,
+        stock: 0,
+        discounts: [],
+      });
+      expect(result.current.showNewProductForm).toBe(false);
+    });
+
+    test('상품 폼의 보이기/숨기기 상태를 변경할 수 있는지 확인', () => {
+      const { result } = renderHook(() => useProductForm(mockOnProductAdd));
+
+      act(() => {
+        result.current.setShowNewProductForm(true);
+      });
+      expect(result.current.showNewProductForm).toBe(true);
+
+      act(() => {
+        result.current.setShowNewProductForm(false);
+      });
+      expect(result.current.showNewProductForm).toBe(false);
     });
   });
 });
